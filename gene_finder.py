@@ -2,7 +2,7 @@
 """
 YOUR HEADER COMMENT HERE
 
-@author: YOUR NAME HERE
+@author: Nina Tchirkova
 
 """
 
@@ -30,6 +30,14 @@ def get_complement(nucleotide):
     >>> get_complement('C')
     'G'
     """
+    if nucleotide == 'A':
+        return 'T'
+    elif nucleotide == 'T':
+        return 'A'
+    elif nucleotide == 'C':
+        return 'G'
+    elif nucleotide == 'G':
+        return 'C'
     # TODO: implement this
     pass
 
@@ -45,6 +53,11 @@ def get_reverse_complement(dna):
     >>> get_reverse_complement("CCGCGTTCA")
     'TGAACGCGG'
     """
+    reverse = ''
+    length = len(dna)
+    for i in range(length):
+        reverse = reverse + get_complement(dna[length - 1 - i])
+    return reverse
     # TODO: implement this
     pass
 
@@ -62,10 +75,25 @@ def rest_of_ORF(dna):
     >>> rest_of_ORF("ATGAGATAGG")
     'ATGAGA'
     """
+    length = len(dna)
+    cleanDNA = ''
+    for i in range (i, length, 3):
+        codon = dna[i:i+3]
+        if codon == 'TAA' or codon == 'TAG' codon == 'TGA':
+            break
+        else:
+            cleanDNA = cleanDNA + codon
+    return cleanDNA
     # TODO: implement this
     pass
 
-
+def find_start(dna):
+    """ returns index of first start codon (if there is no start codon returns -1)"""
+    for i in range(0, len(dna), 3):
+        codon = dna[i:i+3]
+        if codon == 'ATG':
+            return i
+    return -1
 def find_all_ORFs_oneframe(dna):
     """ Finds all non-nested open reading frames in the given DNA
         sequence and returns them as a list.  This function should
@@ -79,6 +107,18 @@ def find_all_ORFs_oneframe(dna):
     >>> find_all_ORFs_oneframe("ATGCATGAATGTAGATAGATGTGCCC")
     ['ATGCATGAATGTAGA', 'ATGTGCCC']
     """
+    orfList = [] #list of orfs
+    while True:
+        startIndex = find_start(dna)
+        if startIndex == -1:
+            break
+        else:
+            dna = dna[startIndex:] #cuts off all DNA before start codon
+            orf = rest_of_ORF(dna)
+            orfList.append(orf) #cleaned orf is added to orf list
+            newStart = len(orf)
+            dna = dna[newStart:] #prepares sequence to be tested for more start cod
+    return orfList
     # TODO: implement this
     pass
 
@@ -96,6 +136,10 @@ def find_all_ORFs(dna):
     >>> find_all_ORFs("ATGCATGAATGTAG")
     ['ATGCATGAATGTAG', 'ATGAATGTAG', 'ATG']
     """
+    orfList = find_all_ORFs_oneframe(dna)
+    orfList = orfList + find_all_ORFs_oneframe(dna[1:])
+    orfList = orfList + find_all_ORFs_oneframe(dna[2:])
+    return(orfList)
     # TODO: implement this
     pass
 
@@ -109,6 +153,10 @@ def find_all_ORFs_both_strands(dna):
     >>> find_all_ORFs_both_strands("ATGCGAATGTAGCATCAAA")
     ['ATGCGAATG', 'ATGCTACATTCGCAT']
     """
+    orfList = find_all_ORFs(dna)
+    reverse = get_reverse_complement(dna)
+    orfList = orfList + find_all_ORFs(reverse)
+    return orfList
     # TODO: implement this
     pass
 
