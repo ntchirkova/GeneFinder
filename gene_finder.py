@@ -260,7 +260,7 @@ def gene_finder(dna):
 
 
 if __name__ == "__main__":
-    #import doctest
-    #doctest.testmod()
-    print(gene_finder(dna))
-    print("done thanks Nina")
+    import doctest
+    doctest.testmod()
+    #print(gene_finder(dna))
+    #print("done thanks Nina")
