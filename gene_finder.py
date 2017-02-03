@@ -9,7 +9,7 @@ YOUR HEADER COMMENT HERE
 import random
 from amino_acids import aa, codons, aa_table   # you may find these useful
 from load import load_seq
-
+dna = load_seq("./data/X73525.fa")
 
 def shuffle_string(s):
     """Shuffles the characters in the input string
@@ -193,8 +193,12 @@ def longest_ORF(dna):
     >>> longest_ORF("ATGCGAATGTAGCATCAAA")
     'ATGCTACATTCGCAT'
     """
-    # TODO: implement this
-    pass
+    orfList = find_all_ORFs_both_strands(dna)
+    longest = ''
+    for orf in orfList:
+        if len(orf) > len(longest):
+            longest = orf
+    return longest
 
 
 def longest_ORF_noncoding(dna, num_trials):
@@ -204,8 +208,14 @@ def longest_ORF_noncoding(dna, num_trials):
         dna: a DNA sequence
         num_trials: the number of random shuffles
         returns: the maximum length longest ORF """
-    # TODO: implement this
-    pass
+    length = 0
+    for i in range(num_trials):
+        dna = shuffle_string(dna)
+        longest = longest_ORF(dna)
+        if length < len(longest):
+            length = len(longest)
+    return length
+
 
 
 def coding_strand_to_AA(dna):
@@ -222,8 +232,13 @@ def coding_strand_to_AA(dna):
         >>> coding_strand_to_AA("ATGCCCGCTTT")
         'MPA'
     """
-    # TODO: implement this
-    pass
+    acids = ''
+    for i in range(0,len(dna)-len(dna)%3,3):
+        codon = dna[i:i+3]
+        acids += aa_table[codon]
+    return acids
+
+
 
 
 def gene_finder(dna):
@@ -232,9 +247,20 @@ def gene_finder(dna):
         dna: a DNA sequence
         returns: a list of all amino acid sequences coded by the sequence dna.
     """
-    # TODO: implement this
-    pass
+    threshold = longest_ORF_noncoding(dna, 1500)
+    aa_list = []
+    orfList = find_all_ORFs_both_strands(dna)
+    for orf in orfList:
+        if len(orf) > threshold:
+            acid = coding_strand_to_AA(orf)
+            aa_list.append(acid)
+
+    return aa_list
+
+
 
 if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
+    #import doctest
+    #doctest.testmod()
+    print(gene_finder(dna))
+    print("done thanks Nina")
